@@ -13,8 +13,6 @@ CREATE  TABLE `labProj_users` (
 CREATE  TABLE `labProj_videos` (
   `userid` INT(11) NOT NULL ,
   `vidurl` VARCHAR(255) NOT NULL ,
-  `dislikes` INT NULL DEFAULT 0 ,
-  `likes` INT NULL DEFAULT 0 ,
   `views` INT NULL DEFAULT 0 ,
   `date` DATETIME NOT NULL ,
   `descreption` TEXT NULL ,
@@ -57,4 +55,25 @@ CREATE  TABLE `labProj_comments` (
     REFERENCES `201601310`.`labProj_videos` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
+
+    CREATE  TABLE `labProj_likes` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `userid` INT NOT NULL ,
+  `videoid` INT NOT NULL ,
+  `type` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) ,
+  INDEX `vidIdForeign_idx` (`videoid` ASC) ,
+  INDEX `userIdForeign_idx` (`userid` ASC) ,
+  CONSTRAINT `vidIdForeign`
+    FOREIGN KEY (`videoid` )
+    REFERENCES `201601310`.`labProj_videos` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `userIdForeign`
+    FOREIGN KEY (`userid` )
+    REFERENCES `201601310`.`labProj_users` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
 
