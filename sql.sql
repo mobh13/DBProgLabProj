@@ -1,10 +1,10 @@
 CREATE  TABLE `labProj_users` (
   `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(250) NOT NULL ,
   `username` VARCHAR(250) NOT NULL ,
   `password` VARCHAR(250) NOT NULL ,
   `avatar` VARCHAR(250) ,
   `email` VARCHAR(250) NOT NULL ,
-  `dob` DATE NOT NULL ,
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) ,
   UNIQUE INDEX `username_UNIQUE` (`username` ASC) ,

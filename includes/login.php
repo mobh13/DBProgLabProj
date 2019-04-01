@@ -12,7 +12,6 @@ Class Login extends Users {
     public $domain;
 
     function __construct() {
-        parent::__construct();
         $this->ok = false;
         $this->salt = 'ENCRYPT';
         $this->domain = '';
@@ -23,9 +22,9 @@ Class Login extends Users {
         return $this->ok;
     }
 
-    function check_session() {
+     function check_session() {
 
-        if (!empty($_SESSION['uid'])) {
+        if (!empty($_SESSION['id'])) {
             $this->ok = true;
             return true;
         }
@@ -34,22 +33,22 @@ Class Login extends Users {
     }
 
     function check_cookie() {
-        if (!empty($_COOKIE['uid'])) {
+        if (!empty($_COOKIE['id'])) {
             $this->ok = true;
-            return $this->check($_COOKIE['uid']);
+            return $this->check($_COOKIE['id']);
         }
         else
             return false;
     }
 
-    function check($uid) {
-        $this->initWithUid($uid);
-        if ($this->getUid() != null && $this->getUid() == $uid) {
+    function check($id) {
+        $this->initWithId($id);
+        if ($this->getId() != null && $this->getId() == $id) {
             $this->ok = true;
 
-            $_SESSION['uid'] = $this->getUid();
+            $_SESSION['id'] = $this->getId();
             $_SESSION['username'] = $this->getUsername();
-            setcookie('uid', $_SESSION['uid'], time() + 60 * 60 * 24 * 7, '/', $this->domain);
+            setcookie('id', $_SESSION['id'], time() + 60 * 60 * 24 * 7, '/', $this->domain);
             setcookie('username', $_SESSION['username'], time() + 60 * 60 * 24 * 7, '/', $this->domain);
 
             return true;
@@ -61,17 +60,17 @@ Class Login extends Users {
         return false;
     }
 
-    function login($username, $password) {
+    function login($email, $password) {
 
         try {
-            $this->checkUser($username, $password);
+            $this->checkUser($email, $password);
 
-            if ($this->getUid() != null) {
+            if ($this->getId() != null) {
                 $this->ok = true;
 
-                $_SESSION['uid'] = $this->getUid();
+                $_SESSION['id'] = $this->getId();
                 $_SESSION['username'] = $this->getUsername();
-                setcookie('uid', $_SESSION['uid'], time() + 60 * 60 * 24 * 7, '/', $this->domain);
+                setcookie('id', $_SESSION['id'], time() + 60 * 60 * 24 * 7, '/', $this->domain);
                 setcookie('username', $_SESSION['username'], time() + 60 * 60 * 24 * 7, '/', $this->domain);
 
                 return true;
@@ -88,9 +87,9 @@ Class Login extends Users {
 
     function logout() {
         $this->ok = false;
-        $_SESSION['uid'] = '';
+        $_SESSION['id'] = '';
         $_SESSION['username'] = '';
-        setcookie('uid', '', time() - 3600, '/', $this->domain);
+        setcookie('id', '', time() - 3600, '/', $this->domain);
         setcookie('username', '', time() - 3600, '/', $this->domain);
         session_destroy();
     }

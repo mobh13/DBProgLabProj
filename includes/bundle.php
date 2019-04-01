@@ -5,7 +5,7 @@
  * Date: 27/03/2019
  * Time: 10:31 AM
  */
-
+session_start();
 
 $debug = true;
 if($debug){

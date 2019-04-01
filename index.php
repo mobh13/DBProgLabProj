@@ -1,3 +1,4 @@
+<?php require "includes/bundle.php"?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,14 +6,15 @@
     <title>Title</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+
             crossorigin="anonymous"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
 
 </head>
 
 <body>
+<?php include 'login.html';?>
 <div class="container">
     <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
@@ -24,8 +26,15 @@
                 <a class="text-muted" href="#">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"></circle><path d="M21 21l-5.2-5.2"></path></svg>
                 </a>
-                <a class="btn btn-sm btn-outline-secondary" href="#">Sign up/Login</a>
-            </div>
+                <?php
+                $login = new Login();
+                if(!$login->check_session()){
+
+                ?>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">
+                    Sign up/Login
+                </button>    <?php    }
+                ?>    </div>
         </div>
     </header>
 
