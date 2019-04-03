@@ -53,13 +53,17 @@ Class Login extends Users {
 
             return true;
         }
-        else
+        else{
             $error[] = 'Wrong Username';
 
 
-        return false;
+        return false;}
     }
-
+    function checkUser($email, $password){
+        $db = Database::getInstance();
+        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE email = \''.$email.'\' AND password = \''.$password.'\'');
+        $this->initWith($data->id, $data->username, $data->password, $data->email);
+    }
     function login($email, $password) {
 
         try {
@@ -93,5 +97,12 @@ Class Login extends Users {
         setcookie('username', '', time() - 3600, '/', $this->domain);
         session_destroy();
     }
+    private function initWith($id, $username, $password, $email) {
+        $this->setId($id) ;
+        $this->setUsername($username);
+        $this->setPassword($password);
+        $this->setEmail($email);
+    }
+
 
 }

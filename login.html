@@ -52,6 +52,15 @@
                             $("#RegisterError").show();
                         } else if(data == 'suc')  {
                             location.reload();
+                        } else if (data == 'emailExist'){
+
+                            $("#RegisterError").text("Error: Email Already Exist in our database");
+                            $("#RegisterError").show()
+                        }
+                         else if (data == 'usernameExist'){
+
+                            $("#RegisterError").text("Error: Username Already Exist in our database");
+                            $("#RegisterError").show()
                         }
                     }
                 });

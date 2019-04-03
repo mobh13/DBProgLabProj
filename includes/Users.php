@@ -13,7 +13,7 @@ class Users
     private $username;
     private $password;
     private $email;
-    private $dob;
+    private $name;
     private $avatar;
     /**
      * @return mixed
@@ -82,17 +82,17 @@ class Users
     /**
      * @return mixed
      */
-    public function getDob()
+    public function getName()
     {
-        return $this->dob;
+        return $this->name;
     }
 
     /**
      * @param mixed $dob
      */
-    public function setDob($dob)
+    public function setName($name)
     {
-        $this->dob = $dob;
+        $this->name = $name;
     }
 
     /**
@@ -111,9 +111,18 @@ class Users
         $this->avatar = $avatar;
     }
 
+    private function initWith($id, $username, $password, $email,$avatar,$name) {
+        $this->id = $id;
+        $this->username = $username;
+        $this->password = $password;
+        $this->email = $email;
+        $this->avatar = $avatar;
+        $this->name = $name;
+    }
+
     function deleteUser() {
         try {
-            $db = DB::getInstance();
+            $db = Database::getInstance();
             $data = $db->querySql('Delete from labProj_users where id=' . $this->id);
             return true;
         } catch (Exception $e) {
@@ -124,46 +133,41 @@ class Users
 
     function initWithId($id) {
 
-        $db = DB::getInstance();
-        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE id = ' . $id);
-        $this->init($data->id, $data->username, $data->password, $data->email,$data->avatar,$data->dob);
+        $db = Database::getInstance();
+        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE id = ' . id);
+        $this->initWith($data->id, $data->username, $data->password, $data->email,$data->avatar,$data->name);
     }
-    function initWithUsername($username) {
 
-        $db = DB::getInstance();
-        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE username = ' . $username);
-        $this->init($data->id, $data->username, $data->password, $data->email,$data->avatar,$data->dob);
+    function checkUser($email, $password){
+        $db = Database::getInstance();
+        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE email = \''.$email.'\' AND password = \''.$password.'\'');
+        $this->initWith($data->id, $data->username, $data->password, $data->email,$data->avatar,$data->name);
     }
-    private function init($id, $username, $password, $email,$avatar,$dob) {
-        $this->id = $id;
-        $this->username = $username;
-        $this->password = $password;
-        $this->email = $email;
-        $this->avatar = $avatar;
-        $this->dob = $dob;
-    }
-    function getAllUsers() {
-        $db = DB::getInstance();
-        $data = $db->multiFetch('Select * from labProj_users');
-        return $data;
-    }
-    function updateDB() {
 
-        $db = DB::getInstance();
-        $data = 'UPDATE labProj_users set
-			email = \'' . $this->email . '\' ,
-			username = \'' . $this->username . '\' ,
-			password = \'' . $this->password . '\'  ,
-			dob = \'' . $this->dob . '\',  
-			avatar = \'' . $this->avatar . '\'  
-				WHERE id = ' . $this->id;
-        $db->querySql($data);
+    function initWithUsername() {
+
+        $db = Database::getInstance();
+        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE username = \'' . $this->username.'\'');
+        if ($data != null) {
+            return false;
+        }
+        return true;
     }
+    function initWithEmail() {
+
+        $db = Database::getInstance();
+        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE email = \'' . $this->email.'\'');
+        if ($data != null) {
+            return false;
+        }
+        return true;
+    }
+
     function registerUser() {
 
         try {
-            $db = DB::getInstance();
-            $data = $db->querySql('INSERT INTO labProj_users (id, username, password, email,avatar,dob) VALUES (NULL, \'' . $this->username . '\',\'' . $this->password . '\',\'' . $this->email . '\',\'' . $this->avatar . '\',\'' . $this->dob . '\')');
+            $db = Database::getInstance();
+            $data = $db->querySql('INSERT INTO labProj_users (id, username, password, email,`name`) VALUES (NULL, \'' . $this->username . '\',\'' . $this->password . '\',\'' . $this->email . '\',\'' . $this->name . '\')');
             return true;
         } catch (Exception $e) {
             echo 'Exception: ' . $e;
@@ -172,8 +176,23 @@ class Users
     }
 
 
+    function updateDB() {
 
+        $db = Database::getInstance();
+        $data = 'UPDATE labProj_users set
+			email = \'' . $this->email . '\' ,
+			username = \'' . $this->username . '\' ,
+			avatar = \'' . $this->avatar . '\' ,
+			password = \'' . $this->password . '\'  
+				WHERE id = ' . $this->id;
+        $db->querySql($data);
+    }
 
+    function getAllusers() {
+        $db = Database::getInstance();
+        $data = $db->multiFetch('Select * from labProj_users');
+        return $data;
+    }
 
     function checkExist(){
 
@@ -198,6 +217,7 @@ class Users
 
         return $errors;
     }
+
 
 
 }

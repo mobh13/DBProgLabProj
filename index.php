@@ -34,6 +34,11 @@
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">
                     Sign up/Login
                 </button>    <?php    }
+                else{
+                    ?>
+
+                <?php
+                }
                 ?>    </div>
         </div>
     </header>
