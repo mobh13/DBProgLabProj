@@ -3,9 +3,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>My Videos</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="assets/css/styles.css"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
 
             crossorigin="anonymous"></script>
@@ -13,19 +16,17 @@
 
 </head>
 
-<body>
+<body class="" style="background: ">
 <?php include 'login.html';?>
-<div class="container">
+<div class="container" >
     <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
 
             <div class="col-4 text-center">
-                <a class="card-link text-dark" href="#"><h2>Large</h2></a>
+                <a class="card-link text-dark" href="index.php"><img src="assets/logo.jpg" style="height: 120px"/> </a>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
-                <a class="text-muted" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"></circle><path d="M21 21l-5.2-5.2"></path></svg>
-                </a>
+
                 <?php
                 $login = new Login();
                 if(!$login->check_session()){
@@ -35,126 +36,131 @@
                     Sign up/Login
                 </button>    <?php    }
                 else{
+                    $user = new Users();
+                    $user->initWithId($_SESSION["id"]);
                     ?>
+<a href="myprofile.php"><img src="<?php echo $user->getAvatar();?> " class="rounded-circle avatar mr-2"/> </a>
+                    <div class="col-md-5 justify-content-center align-content-center text-center">  <a  href="uploadvid.php" class="btn btn-sm btn-info mb-1"> Upload Video</a>
+                        <a  href="logout.php" class="btn btn-sm btn-secondary">Logout</a>
+                    </div>
 
-                <?php
+
+                    <?php
                 }
                 ?>    </div>
         </div>
+
     </header>
 
-    <div class="nav-scroller py-1 mb-2">
-        <nav class="nav d-flex justify-content-between">
-            <a class="p-2 text-muted" href="#">World</a>
-            <a class="p-2 text-muted" href="#">U.S.</a>
-            <a class="p-2 text-muted" href="#">Technology</a>
-            <a class="p-2 text-muted" href="#">Design</a>
-            <a class="p-2 text-muted" href="#">Culture</a>
-            <a class="p-2 text-muted" href="#">Business</a>
+    <div class="nav-scroller py-1 mb-3 " style="background:  #da575b"  >
+        <nav class="nav d-flex justify-content-center  ">
+            <?php $category = new Category();
+            $categories= $category->getAllCategories();
+            foreach ($categories as $cat){?>
+                <a class="pl-5 pr-5 p-2" style="color: #ffffff" href="cat.php?id=<?php echo $cat->id ;?>"><?php echo $cat->title ;?></a>
 
+<?php }
+            ?>
         </nav>
     </div>
 
 
+    <div class="row mb-3">
+        <div class="col-12">
+           <form action="search.php">
+
+               <input class="form-control text-center " style="background:#FCFCFC "  type="search"  placeholder="To search Write your text here and press enter" name="search">
+           </form>
+        </div>
+    </div>
 </div>
 
 <main role="main" class="container">
+    <?php
+    $login = new Login();
+    if($login->check_session()){
+
+    ?>
     <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-12">
+            <div class="row mb-1">
+                <div class="col-12">
+                  <h6 class="alert alert-info"> Welcome <?php echo $user->getUsername(); ?> !</h6>
+                </div>
+            </div>
+            <?php }?>
+    <div class="row">
+        <div class="col-md-12">
             <div class="row mb-1">
             <div class="col-12">
                 <h5>Latest Videos</h5>
             </div>
         </div>
-            <div class="row mb-2">
-                <div class="col-md-6">
-                    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                        <div class="col p-4  d-flex flex-column position-static">
-                            <strong class="d-inline-block mb-2 text-primary">World</strong>
-                            <h4 class="mb-0">Featured Vid</h4>
-                            <div class="mb-1 text-muted">Nov 12</div>
-                            <p class="card-text mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="stretched-link">Watch Now</a>
-                        </div>
-                        <div class="col-auto d-none d-lg-block">
-                            <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-                        </div>
+            <div class="row mb-2 justify-content-center">
+            <?php
+            $videos = new video();
+            $latest = $videos->getLatestVideos(9);
+            foreach ($latest as $vid){
+
+?>
+                <div class=" card col-md-3  p-0 m-1" style="background: #ececec; color: #142d4c" >
+                    <a href="showvid.php?id=<?php echo $vid->id;?>"> <img class="card-img-top" src="<?php echo $vid->thumbnail;?>" alt="Card image cap"></a>
+                    <div class="card-body mb-0">
+                        <a href="showvid.php?id=<?php echo $vid->id;?>">   <h5 class="card-title mb-0"><?php echo $vid->title;?></h5></a>
+                        <a href="profile.php?id=<?php echo $vid->userid;?>">     <p class=" card-subtitle  small text-muted mb-0">@<?
+                                $user = new Users();
+                                $user->initWithId($vid->userid);
+                                echo $user->getUsername();?></p></a>
+                        <p class="small text-muted mb-0"><?php echo number_format($vid->views);?>Views <b class="align-self-center">.</b> <?php echo time_elapsed_string($vid->date);?></p>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                        <div class="col p-4 d-flex flex-column position-static">
-                            <strong class="d-inline-block mb-2 text-success">Design</strong>
-                            <h4 class="mb-0">Post title</h4>
-                            <div class="mb-1 text-muted">Nov 11</div>
-                            <p class="mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="stretched-link">Continue reading</a>
-                        </div>
-                        <div class="col-auto d-none d-lg-block">
-                            <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-                        </div>
-                    </div>
+            <?php
+
+            }
+            ?>
+
+
+
+
+
+
+            </div>
+            <div class="row mb-1">
+                <div class="col-12">
+                    <h5>Popular Videos</h5>
                 </div>
             </div>
-            <div class="row mb-2">
-                <div class="col-md-6">
-                    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                        <div class="col p-4  d-flex flex-column position-static">
-                            <strong class="d-inline-block mb-2 text-primary">World</strong>
-                            <h4 class="mb-0">Featured Vid</h4>
-                            <div class="mb-1 text-muted">Nov 12</div>
-                            <p class="card-text mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="stretched-link">Watch Now</a>
-                        </div>
-                        <div class="col-auto d-none d-lg-block">
-                            <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                        <div class="col p-4 d-flex flex-column position-static">
-                            <strong class="d-inline-block mb-2 text-success">Design</strong>
-                            <h4 class="mb-0">Post title</h4>
-                            <div class="mb-1 text-muted">Nov 11</div>
-                            <p class="mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="stretched-link">Continue reading</a>
-                        </div>
-                        <div class="col-auto d-none d-lg-block">
-                            <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+            <div class="row mb-2 justify-content-center">
+                <?php
+                $videos = new video();
+                $latest = $videos->getTopVideos(9);
+                foreach ($latest as $vid){
+
+                    ?>
+                    <div class=" card col-md-3  p-0 m-1" style="background: #ececec; color: #142d4c" >
+                        <a href="showvid.php?id=<?php echo $vid->id;?>"> <img class="card-img-top" src="<?php echo $vid->thumbnail;?>" alt="Card image cap"></a>
+                        <div class="card-body mb-0">
+                            <a href="showvid.php?id=<?php echo $vid->id;?>">   <h5 class="card-title mb-0"><?php echo $vid->title;?></h5></a>
+                            <a href="profile.php?id=<?php echo $vid->userid;?>">     <p class=" card-subtitle  small text-muted mb-0">@<?
+                                $user = new Users();
+                                $user->initWithId($vid->userid);
+                                    echo $user->getUsername();?></p></a>
+                            <p class="small text-muted mb-0"><?php echo number_format($vid->views);?>Views <b class="align-self-center">.</b> <?php echo time_elapsed_string($vid->date);?></p>
                         </div>
                     </div>
-                </div>
+                    <?php
+
+                }
+                ?>
+
+
+
+
+
+
             </div>
 
-        </div>
-        <div class="col-md-2">
-            <div class="p-4">
-                <h4 class="font-italic">Archives</h4>
-                <ol class="list-unstyled mb-0">
-                    <li><a href="#">March 2014</a></li>
-                    <li><a href="#">February 2014</a></li>
-                    <li><a href="#">January 2014</a></li>
-                    <li><a href="#">December 2013</a></li>
-                    <li><a href="#">November 2013</a></li>
-                    <li><a href="#">October 2013</a></li>
-                    <li><a href="#">September 2013</a></li>
-                    <li><a href="#">August 2013</a></li>
-                    <li><a href="#">July 2013</a></li>
-                    <li><a href="#">June 2013</a></li>
-                    <li><a href="#">May 2013</a></li>
-                    <li><a href="#">April 2013</a></li>
-                </ol>
-            </div>
 
-            <div class="p-4">
-                <h4 class="font-italic">Elsewhere</h4>
-                <ol class="list-unstyled">
-                    <li><a href="#">GitHub</a></li>
-                    <li><a href="#">Twitter</a></li>
-                    <li><a href="#">Facebook</a></li>
-                </ol>
-            </div>
         </div>
     </div>
 

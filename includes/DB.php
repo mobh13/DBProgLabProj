@@ -6,6 +6,7 @@
  * Time: 10:15 AM
  */
 
+
 class DB
 {
 
@@ -14,7 +15,7 @@ class DB
 
     public static function getInstance() {
         if (is_null(self::$instance)) {
-            self::$instance = new Database ( );
+            self::$instance = new DB ( );
         }
         return self::$instance;
     }
@@ -26,7 +27,7 @@ class DB
     }
 
     function connect() {
-        $this->dblink = mysqli_connect('localhost', '201601310', '201601310', '201601310') or die(mysqli_error($this->dblink) . "hello");
+        $this->dblink = mysqli_connect('localhost', 'root', 'root', 'videos') or die(mysqli_error($this->dblink) . "Cannot connect to Database");
     }
 
     function __destruct() {

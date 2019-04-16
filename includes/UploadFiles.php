@@ -18,7 +18,7 @@ class UploadFiles
 
     function __construct() {
         $this->upload_dir = '';
-        $this->max_file_size = 1048576; //Max File Size in Bytes, 1MB
+        $this->max_file_size = 52428800; //Max File Size in Bytes, 50MB
         $this->allowed_mime_types = array('text/plain', 'text/html', 'image/jpeg', 'image/png', 'image/gif', 'image/tiff', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel');
         $this->denied_mime_types = array('application/x-php', 'application/x-javascript', 'application/zip');
         $this->filepath = '';
@@ -93,8 +93,9 @@ class UploadFiles
 
     public function upload($object) {
         $session = '';
-        if (isset($_SESSION['uid']) && $_SESSION['uid'] != '') {
-            $sesion = $_SESSION['uid'] . '/';
+        $error = null;
+        if (isset($_SESSION['id']) && $_SESSION['id'] != '') {
+            $sesion = $_SESSION['id'] . '/';
             if ($this->check_dir($this->upload_dir)) {
                 $files = $_FILES[$object];
                 switch ($files['error']) {
@@ -122,6 +123,65 @@ class UploadFiles
         }
         else
             $error[] = 'NOT ALLOWED';
+
+        //$this->uploadDir(dirname(__FILE__) . '/../users/' . $sesion);
+
+        if (empty($error)) {
+            $files['name'] = $this->make_safe($files['name']);
+            $files['name'] = $this->check_file_exists($files['name']);
+            $this->setFileType($files['type']);
+
+            if ($files['size'] <= 0)
+                $error[] = $files['name'] . ' uploading failed (Size is 0)';
+
+            elseif ($files['size'] >= $this->max_file_size)
+                $error[] = $files['name'] . ' exceeds the MAX_FILE_SIZE';
+
+//            elseif (!in_array($files['type'], $this->allowed_mime_types))
+//                $error[] = $files['name'] . ' is not an allowed type';
+//
+//            elseif (in_array($files['type'], $this->denied_mime_types))
+//                $error[] = $files['name'] . ' is a denied type';
+
+            elseif (!move_uploaded_file($files['tmp_name'], $this->upload_dir . $files['name']))
+                $error[] = $files['name'] . ' could not be uploaded';
+            else
+                $this->setFilepath($files['name']);
+
+
+
+
+        }
+
+        return $error;
+    }
+    public function uploadForRegister($object) {
+
+            if ($this->check_dir($this->upload_dir)) {
+                $files = $_FILES[$object];
+                switch ($files['error']) {
+                    case 0 : break;
+                    case 1 : $error[] = $files['name'] . ' exceeds the upload_max_filesize directive in php.ini';
+                        break;
+                    case 2 : $error[] = $files['name'] . ' exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
+                        break;
+                    case 3 : $error[] = $files['name'] . ' was only partially uploaded';
+                        break;
+                    case 4 : $error[] = $files['name'] . ' uploading failed 1';
+                        break;
+                    case 6 : $error[] = 'Missing a temporary folder';
+                        break;
+                    case 7 : $error[] = 'Failed to write ' . $files['name'] . ' to disk';
+                        break;
+                    case 8 : $error[] = $files['name'] . ' stopped by extension';
+                        break;
+                    default : $error[] = 'Unidentified Error, caused by ' . $files['name'];
+                        break;
+                }
+            }
+            else
+                $error[] = 'No Directory Permissions';
+
 
         //$this->uploadDir(dirname(__FILE__) . '/../users/' . $sesion);
 

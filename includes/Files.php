@@ -11,6 +11,7 @@ class Files
     private $id;
     private $vidid;
     private $fileurl;
+    private $db_table = "labProj_files";
 
     /**
      * @return mixed
@@ -59,27 +60,37 @@ class Files
     {
         $this->fileurl = $fileurl;
     }
+    public function addToDB()
+    {
+        $db = DB::getInstance();
+        $query = "insert into $this->db_table (vidid,fileurl) values ('$this->vidid','$this->fileurl')";
+        $db->querySQL($query);
+    }
     function updateDB() {
 
-        $db = Database::getInstance();
-        $data = 'UPDATE files set
-			fname = \'' . $this->fname . '\' ,
-			ftype = \'' . $this->ftype . '\' ,
-			flocation = \'' . $this->flocation . '\' ,
-                        uid = ' . $this->uid . '
-				WHERE fid = ' . $this->fid;
+        $db = DB::getInstance();
+        $data = 'UPDATE '.$this->db_table.' set
+			vidid = \'' . $this->vidid . '\' ,
+			fileurl = \'' . $this->fileurl . '\' ,
+				WHERE id = ' . $this->id;
         $db->querySql($data);
     }
 
     function getAllFiles() {
         $db = DB::getInstance();
-        $data = $db->multiFetch('Select * from files');
+        $data = $db->multiFetch('Select * from '.$this->db_table);
         return $data;
     }
 
     function getVideoFiles() {
         $db = DB::getInstance();
-        $data = $db->multiFetch('Select * from files where vidid=' . $this->vidid);
+        $data = $db->multiFetch('Select * from '.$this->db_table.' where vidid=' . $this->vidid);
+
         return $data;
+    }
+    function checkForFiles() {
+        $db = DB::getInstance();
+        $data = $db->singleFetch('Select count(*) as fileCount from '.$this->db_table.' where vidid=' . $this->vidid);
+        return $data->fileCount;
     }
 }

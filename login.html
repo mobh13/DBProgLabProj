@@ -4,7 +4,10 @@
     $(document).ready(function () {
         $("#loginError").hide();
         $("#RegisterError").hide();
-        $("#LoginButton").click(function () {
+
+        $("#LoginForm").submit(function () {
+            $("#LoginButton").innerHTML = '<i class=\"fa fa-spinner fa-pulse fa-3x fa-fw\"></i>\n' +
+            '<span class=\"sr-only\">Loading...</span>';
             $("#loginError").hide();
 
             let email = $("#LoginEmail").val();
@@ -17,9 +20,15 @@
                     data: {login: "login", email: email, password: pass},
                     success: function (data) {
                         if (data == 'fail') {
+                            $("#LoginButton").innerHTML = "Login";
                             $("#loginError").text("Error Please Check your username and password");
                             $("#loginError").show();
-                        } else if(data == 'suc')  {
+                        }else if(data == 'empty')  {
+                            $("#LoginButton").innerHTML = "Login";
+                            $("#loginError").text("Error Please fill all fileds");
+                            $("#loginError").show();
+                        }
+                        else if(data == 'suc')  {
                             location.reload();
                         }
                     }
@@ -27,40 +36,69 @@
             } else {
 
                 $("#loginError").text("Please Fill All details");
+                $("#LoginButton").innerHTML = "Login";
                 $("#loginError").show();
             }
 
             return false;
 
         });
-        $("#RegisterButton").click(function () {
+        $("#RegisterForm").submit(function () {
             $("#RegisterError").hide();
-
+            $("#RegisterButton").innerHTML = '<i class=\"fa fa-spinner fa-pulse fa-3x fa-fw\"></i>\n' +
+                '<span class=\"sr-only\">Loading...</span>';
             let name = $("#RegisterName").val();
             let username = $("#RegisterUsername").val();
             let email = $("#RegisterEmail").val();
             let password = $("#RegisterPassword").val();
             if (email != "" && password != "" && name != "" && username != "") {
-
+                var form = document.getElementById("RegisterForm");
+                let formData = new FormData(form);
+                formData.append("register","upload");
                 jQuery.ajax({
                     url: "loginAndRegister.php",
                     method: "POST",
-                    data: {register: "register", email: email, password: password,name:name,username:username},
+                    data: formData,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
                     success: function (data) {
                         if (data == 'fail') {
                             $("#RegisterError").text("Error Please Check with the admin");
                             $("#RegisterError").show();
+                            $("#RegisterButton").innerHTML = "Register";
+
                         } else if(data == 'suc')  {
                             location.reload();
                         } else if (data == 'emailExist'){
 
                             $("#RegisterError").text("Error: Email Already Exist in our database");
-                            $("#RegisterError").show()
+                            $("#RegisterError").show();
+                            $("#RegisterButton").innerHTML = "Register";
+
+                        }else if (data == 'empty'){
+
+                            $("#RegisterError").text("Error: All fields are required");
+                            $("#RegisterError").show();
+                            $("#RegisterButton").innerHTML = "Register";
+
+                        }else if (data == 'avatarNotValid'){
+
+                            $("#RegisterError").text("Error: Avatar is not valid");
+                            $("#RegisterError").show();
+                            $("#RegisterButton").innerHTML = "Register";
+
                         }
                          else if (data == 'usernameExist'){
 
                             $("#RegisterError").text("Error: Username Already Exist in our database");
-                            $("#RegisterError").show()
+                            $("#RegisterError").show();
+                            $("#RegisterButton").className = "Register";
+
+                        }else{
+                            $("#RegisterError").text(data.toString());
+                            $("#RegisterError").show();
+                            $("#RegisterButton").className = "Register";
                         }
                     }
                 });
@@ -68,6 +106,8 @@
 
                 $("#RegisterError").text("Please Fill All details");
                 $("#RegisterError").show();
+                $("#RegisterButton").innerHTML = "Register";
+
             }
 
             return false;
@@ -106,7 +146,7 @@
                         <div class="tab-content">
                             <div class="tab-pane active" id="Login">
                                 <div class="alert alert-danger" id="loginError"></div>
-                                <form role="form" id="LoginForm" class="" method="post">
+                                <form role="form" id="LoginForm" class="" method="post" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <label for="LoginEmail" class="col-sm-2 form-control-label">
                                             Email</label>
@@ -126,7 +166,7 @@
                                     <div class="form-group">
 
                                         <div class="col-sm-10">
-                                            <button type="button" class="btn btn-primary btn-sm" id="LoginButton">
+                                            <button type="submit" class="btn btn-primary btn-sm" id="LoginButton">
                                                 Login
                                             </button>
                                         </div>
@@ -137,14 +177,14 @@
                             <div class="tab-pane" id="Registration">
                                 <div class="alert alert-danger" id="RegisterError" ></div>
 
-                                <form role="form" class="">
+                                <form role="form" id="RegisterForm" class="" method="post" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <label for="RegisterName" class="col-sm-2 form-control-label">
                                             Name</label>
                                         <div class="col-sm-10">
 
                                             <input type="text" class="form-control" placeholder="Name"
-                                                   id="RegisterName"/>
+                                                   id="RegisterName" name="name"/>
                                         </div>
 
                                     </div>
@@ -153,8 +193,8 @@
                                         <label for="RegisterUsername" class="col-sm-2 form-control-label">
                                             Username</label>
                                         <div class="col-sm-10">
-                                            <input type="email" class="form-control" id="RegisterUsername"
-                                                   placeholder="Email"/>
+                                            <input type="text" class="form-control" id="RegisterUsername"
+                                                   placeholder="Username" name="username"/>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -162,7 +202,7 @@
                                             Email</label>
                                         <div class="col-sm-10">
                                             <input type="email" class="form-control" id="RegisterEmail"
-                                                   placeholder="Email"/>
+                                                   placeholder="Email" name="email"/>
                                         </div>
                                     </div>
 
@@ -171,12 +211,20 @@
                                             Password</label>
                                         <div class="col-sm-10">
                                             <input type="password" class="form-control" id="RegisterPassword"
-                                                   placeholder="Password"/>
+                                                   placeholder="Password" name="password"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="avatar" class="col-sm-2 form-control-label">
+                                            Avatar</label>
+                                        <div class="col-sm-10">
+                                            <input type="file" class="form-control" id="avatar"
+                                                   placeholder="avatar" name="avatar"/>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="col-sm-10">
-                                            <button type="button" class="btn btn-info btn-sm" id="RegisterButton">
+                                            <button type="submit" class="btn btn-info btn-sm" id="RegisterButton">
                                                 Register
                                             </button>
                                             <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">

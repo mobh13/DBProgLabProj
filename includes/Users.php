@@ -15,6 +15,7 @@ class Users
     private $email;
     private $name;
     private $avatar;
+    protected $db_table="labProj_users";
     /**
      * @return mixed
      */
@@ -122,8 +123,8 @@ class Users
 
     function deleteUser() {
         try {
-            $db = Database::getInstance();
-            $data = $db->querySql('Delete from labProj_users where id=' . $this->id);
+            $db = DB::getInstance();
+            $data = $db->querySql('Delete from '.$this->db_table.' where id=' . $this->id);
             return true;
         } catch (Exception $e) {
             echo 'Exception: ' . $e;
@@ -133,41 +134,44 @@ class Users
 
     function initWithId($id) {
 
-        $db = Database::getInstance();
-        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE id = ' . id);
+        $db = DB::getInstance();
+        $data = $db->singleFetch('SELECT * FROM '.$this->db_table.' WHERE id = ' . $id);
         $this->initWith($data->id, $data->username, $data->password, $data->email,$data->avatar,$data->name);
     }
 
     function checkUser($email, $password){
-        $db = Database::getInstance();
-        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE email = \''.$email.'\' AND password = \''.$password.'\'');
+        $db = DB::getInstance();
+        $data = $db->singleFetch('SELECT * FROM '.$this->db_table.' WHERE email = \''.$email.'\' AND password = \''.$password.'\'');
         $this->initWith($data->id, $data->username, $data->password, $data->email,$data->avatar,$data->name);
     }
 
-    function initWithUsername() {
+    function checkWithUsername() {
 
-        $db = Database::getInstance();
-        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE username = \'' . $this->username.'\'');
-        if ($data != null) {
+        $db = DB::getInstance();
+        $data = $db->singleFetch('SELECT count(*) as counter FROM '.$this->db_table.' WHERE username = \'' . $this->username.'\'');
+        if ($data-> counter == 0) {
             return false;
+        }else{
+            return true;
         }
-        return true;
     }
-    function initWithEmail() {
+    function checkWithEmail() {
 
-        $db = Database::getInstance();
-        $data = $db->singleFetch('SELECT * FROM labProj_users WHERE email = \'' . $this->email.'\'');
-        if ($data != null) {
+        $db = DB::getInstance();
+        $data = $db->singleFetch('SELECT count(*) as counter FROM '.$this->db_table.' WHERE email = \'' . $this->email.'\'');
+        if ($data-> counter == 0) {
             return false;
+        }else{
+            return true;
         }
-        return true;
+
     }
 
     function registerUser() {
 
         try {
-            $db = Database::getInstance();
-            $data = $db->querySql('INSERT INTO labProj_users (id, username, password, email,`name`) VALUES (NULL, \'' . $this->username . '\',\'' . $this->password . '\',\'' . $this->email . '\',\'' . $this->name . '\')');
+            $db = DB::getInstance();
+            $data = $db->querySql('INSERT INTO '.$this->db_table.' (id, username, password, email,`name`,avatar) VALUES (NULL, \'' . $this->username . '\',\'' . $this->password . '\',\'' . $this->email . '\',\'' . $this->name . '\',\'' . $this->avatar . '\')');
             return true;
         } catch (Exception $e) {
             echo 'Exception: ' . $e;
@@ -178,9 +182,10 @@ class Users
 
     function updateDB() {
 
-        $db = Database::getInstance();
-        $data = 'UPDATE labProj_users set
+        $db = DB::getInstance();
+        $data = 'UPDATE '.$this->db_table.' set
 			email = \'' . $this->email . '\' ,
+			name = \'' . $this->name . '\' ,
 			username = \'' . $this->username . '\' ,
 			avatar = \'' . $this->avatar . '\' ,
 			password = \'' . $this->password . '\'  
@@ -189,14 +194,13 @@ class Users
     }
 
     function getAllusers() {
-        $db = Database::getInstance();
-        $data = $db->multiFetch('Select * from labProj_users');
+        $db = DB::getInstance();
+        $data = $db->multiFetch('Select * from '.$this->db_table);
         return $data;
     }
 
-    function checkExist(){
 
-    }
+
 
     public function isValid() {
         $errors = array();

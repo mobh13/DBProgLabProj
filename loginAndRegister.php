@@ -6,6 +6,11 @@ if(isset($_POST['login']))
 {
 $email = $_POST["email"];
 $password = $_POST["password"];
+if($_POST["email"] == "" or $_POST["password"] == ""){
+
+    die("empty");
+}else{
+
     if (!$login->login($email,$password)){
         echo "fail";
         exit();
@@ -13,21 +18,29 @@ $password = $_POST["password"];
         echo "suc";
         exit();
     }
+}
+
 
 }
-if(isset($_POST['Register']))
+if(isset($_POST['register']))
 {
-
-    if($login->initWithEmail($_POST['email'])){
+    $login->setEmail($_POST["email"]);
+    $login->setUsername($_POST["username"]);
+    if( $_POST["username"] ==""||$_POST["password"] =="" || $_POST["email"] =="" || $_POST["name"] ==""){
+        echo "empty";
+        die();
+    }
+    if($login->checkWithEmail()){
 
     echo "emailExist";
     exit();
     }
-    if($login->initWithUsername($_POST['username'])){
+    if($login->checkWithUsername()){
 
         echo "usernameExist";
-        exit();
+        die();
     }
+
     $username = $_POST["username"];
     $password = $_POST["password"];
     $email = $_POST["email"];
@@ -37,7 +50,33 @@ if(isset($_POST['Register']))
   $tempUser->setPassword($password);
   $tempUser->setUsername($username);
   $tempUser->setName($name);
+    if(preg_match("!image!",$_FILES["avatar"]["type"]) && $_FILES["avatar"]["size"] > 0){
+
+        $upload = new UploadFiles();
+        if( !$upload->uploadDir("upload/")) {
+            die("fail");
+        }
+        if(!empty($errors = ($upload->uploadForRegister("avatar")))){
+           die(print_r($errors));
+        }else{
+            $avatar = $upload->getUploadDir().$upload->getFilepath();
+            $tempUser->setAvatar($avatar);
+
+        }
+
+
+
+
+
+    }elseif(!preg_match("!image!",$_FILES["avatar"]["type"]) && $_FILES["avatar"]["size"] > 0 ){
+        die("avatarNotValid");
+    }elseif($_FILES["avatar"]["size"] < 0){
+        $tempUser->setAvatar("assets/user.png");
+    }
+
+
   if($tempUser->registerUser()){
+      $login->login($email,$password);
       echo "suc";
       exit();
   }else{
